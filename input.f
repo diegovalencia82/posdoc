@@ -1,5 +1,5 @@
 
-      subroutine input(mspace,nfluid,nvirt)
+      subroutine input(mspace,nfluid,nvirt,sel)
 
 c-----------------------------------------------------------------
 
@@ -26,20 +26,22 @@ c     ntotal-- total particle number                               [out]
       double precision time,x(dim, nmax), vx(dim, nmax), mass(nmax),
      &     p(nmax), u(nmax), hsml(nmax), rho(nmax)
       double precision mspace(25,nmax)
-      integer i, d, im
+      integer i, i1, i2, d, im, sel
       
 c     load initial particle information from external disk file
       open(10,file="snapshot_000",status='old')
-      write(*,*)' **************************************************'
-      write(*,*)'       Loading initial particle configuration...   '
+      if(sel.eq.0)write(*,*)' ****************************************'
+      if(sel.eq.0)write(*,*)'Loading initial particle configuration...'
       read (10,*) itimestep,time,nfluid,nvirt
       ntotal = nfluid + nvirt
       i=1
+      if(sel.eq.0)then
       write(*,*)'       Total number of particles       ', ntotal
       write(*,*)'       Total number of fluid particles       ', nfluid
       write(*,*)'       Total number of virtual particles       ', nvirt
       write(*,*)'       itimestep = ',itimestep,'   Time = ',time
       write(*,*)'   ************************************************'
+      endif
  11   read(10,*,end=12)id(i), (x(d, i),d = 1, dim),
      +     (vx(d, i),d = 1, dim),mass(i), rho(i), p(i), u(i),itype(i),
      +     hsml(i)
@@ -48,7 +50,16 @@ c     load initial particle information from external disk file
  12   close(10)
       i=i-1
 
-      do i=1,nmax
+      if(sel.eq.0)then
+         i1 = 1
+         i2 = nmax
+      endif
+      if(sel.eq.1)then
+         i1 = nfluid + 1
+         i2 = nmax
+      endif
+      
+      do i=i1,i2
          if(dim.eq.2)then 
             mspace(1,i)  = id(i)
             mspace(2,i)  = x(1,i)
@@ -56,13 +67,15 @@ c     mspace(3,i)  = x(2,i)
             mspace(4,i)  = x(2,i)
             mspace(5,i)  = vx(1,i)
 c     mspace(6,i)  = vx(2,i)
-            mspace(7,i)  = vx(2,i)
-            mspace(8,i)  = mass(i)
-            mspace(9,i)  = rho(i)
-            mspace(10,i)  = p(i)
-            mspace(11,i)  = u(i)
-            mspace(12,i) = itype(i)
-            mspace(13,i) = hsml(i)
+            if(sel.eq.0)then
+               mspace(7,i)  = vx(2,i)
+               mspace(8,i)  = mass(i)
+               mspace(9,i)  = rho(i)
+               mspace(10,i)  = p(i)
+               mspace(11,i)  = u(i)
+               mspace(12,i) = itype(i)
+               mspace(13,i) = hsml(i)
+            endif
          endif
          if(dim.eq.3)then 
             mspace(1,i)  = id(i)

@@ -52,7 +52,7 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
 
       mu = 1.!1.0e-3               ! Viscosidad dinámica
       
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          sumvisxx = 0.0
          sumvisxy = 0.0
          sumvisxz = 0.0

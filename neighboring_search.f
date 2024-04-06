@@ -67,14 +67,14 @@ c     mxiij      : matrix of xi-xj for all fluid particles for each interaction 
                call velij(mspace(5,i),mspace(6,i),mspace(7,i),
      +              mspace(5,j),mspace(6,j),mspace(7,j),
      +              vij,vxij,vyij,vzij)
-               if(rij.le.rdomain)then
+               if(rij.lt.rdomain)then
                   nfilas(i) = nfilas(i) + 1
                   if(nfilas(i).gt.npairs)then
                      write(*,*)'neighboring_search.f STOP, i=',i
      +                    ,'j=',j,'nfilas = ',nfilas(i)
                      stop
                   endif
-                  pairs(nfilas(i),i) = j!int(mspace(1,j))
+                  pairs(nfilas(i),i) = int(mspace(1,j))
                   mrij(nfilas(i),i) = rij
                   mxij(1,nfilas(i),i)  = xij
                   mxij(2,nfilas(i),i)  = yij
@@ -111,7 +111,7 @@ c     ----------------------------------------------------------------------
       
       if(dim.eq.2)then
          xij = xi-xj
-         yij = 0.0
+         yij = 0.0d0
          zij = zi-zj
          rij = sqrt(xij*xij + zij*zij)
       endif

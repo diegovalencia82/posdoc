@@ -52,7 +52,7 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
       
       c23 = 2.0d0 / 3.0d0
       
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          sumexx = 0.0
          sumeyy = 0.0
          sumezz = 0.0

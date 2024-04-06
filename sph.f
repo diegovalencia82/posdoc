@@ -40,15 +40,15 @@ c     +     e(nmax), hsml(nmax), dt
 
       dt = dt0
       
-      call input(mspace,nfluid,nvirt)
+      call input(mspace,nfluid,nvirt,0)
       ntotal = nfluid + nvirt
-      ntype(1) = nfluid
+      ntype(1) = nmax!nfluid
       ntype(2) = nvirt
       write(*,*)' **************************************************'
       write(*,*)'        The  maximal time steps = ', maxtimestep
       write(*,*)'        Time steps integration  = ', dt
       write(*,*)' **************************************************' 
 
-      call time_integration(mspace,ntype,dt)
+      call time_integration(mspace,ntotal,ntype,dt)
       
       end      

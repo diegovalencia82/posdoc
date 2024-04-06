@@ -1,7 +1,7 @@
 
 c      subroutine time_integration(id, x,vx, mass, rho, p, u, c, s, e, 
 c     &          itype, hsml, ntotal, dt )
-      subroutine time_integration(mspace,ntype)
+      subroutine time_integration(mspace,ntotal,ntype,dt)
 c----------------------------------------------------------------------
 
 
@@ -37,7 +37,7 @@ c     dt-- timestep                                             [input]
       implicit none 
       include 'param.inc'
 
-      integer i,j,l,ntype(2),ntotal,itimestep,nf,rangg(2)
+      integer i,j,l,ntype(2),ntotal,itimestep,nf,rangg(2),itoutfile
 c      double precision x(dim, nmax), vx(dim, nmax), mass(nmax), 
 c     &      rho(nmax), p(nmax), u(nmax), c(nmax), s(nmax), e(nmax), 
 c     &     hsml(nmax), dt
@@ -48,20 +48,21 @@ c     +     ds(dim,nmax),drho(dim,nmax),av
       double precision xy(4),dxydt(4)
       character infilebas*80,outfile(10000)*80
       
-c --  Make an array of outfiles using a base outfile
+c     --  Make an array of outfiles using a base outfile
+      itoutfile = 0
       infilebas = 'snapshot'
       rangg(1)=1
-      rangg(2)=1000
+      rangg(2)=10000
       call array_infilebase(infilebas,rangg,outfile,1,nf)  
       
 c---  Definition of variables derivates
-      
+
       itimestep = 0
       t = 0.0
       
  10   call single_step(mspace,ntype,itimestep,dt,av)
 
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          xy(1) = mspace(2,i)
          xy(2) = mspace(4,i)
          xy(3) = mspace(5,i)
@@ -75,10 +76,11 @@ c         mspace(5,i) = mspace(5,i) + dt0*mspace(20,i)
 c         mspace(4,i) = mspace(4,i) + dt0*mspace(7,i)
 c         mspace(7,i) = mspace(7,i) + dt0*mspace(22,i)
 
-         xy(1) = xy(1) + dt0*xy(3)
          xy(3) = xy(3) + dt0*mspace(20,i)
-         xy(2) = xy(2) + dt0*xy(4)
+         xy(1) = xy(1) + dt0*xy(3)
          xy(4) = xy(4) + dt0*mspace(22,i)
+         xy(2) = xy(2) + dt0*xy(4)
+
          
 c         call rk4_dd(xy,dxydt,4,t(i),dt0,xy,derivadas,mspace,i)
 
@@ -86,7 +88,7 @@ c         call rk4_dd(xy,dxydt,4,t(i),dt0,xy,derivadas,mspace,i)
          mspace(4,i) = xy(2)
          mspace(5,i) = xy(3)
          mspace(7,i) = xy(4)
-         write(*,*)i,xy,mspace(20,i),mspace(22,i)
+c         write(*,*)i,xy,mspace(20,i),mspace(22,i)
 
          
       enddo
@@ -94,22 +96,26 @@ c         call rk4_dd(xy,dxydt,4,t(i),dt0,xy,derivadas,mspace,i)
       itimestep = itimestep + 1
       t(itimestep) = itimestep * dt0
       write(*,*)'iteration',itimestep,'time = ',t(itimestep)
-      write(*,*)'Saving file = ',outfile(itimestep)
 
-      l = len_trim(outfile(itimestep))
-      open(1,file=outfile(itimestep))
-      write(1,*)itimestep,t(itimestep),ntype(1),ntype(2)
+      if (mod(itimestep,save_step).eq.0) then
+         itoutfile = itoutfile + 1
+         write(*,*)'Saving file = ',outfile(itoutfile)
+         
+         l = len_trim(outfile(itoutfile))
+         open(1,file=outfile(itoutfile))
+         write(1,*)itimestep,t(itimestep),ntype(1),ntype(2)
       
-      do i=1,nmax
-c         write(1,*) i, (x(d, i),d = 1, dim), (vx(d, i),d = 1, dim),
-c     +        mass(i), rho(i), p(i), u(i), itype(i), hsml(i)
-         write(1,*)int(mspace(1,i)),real(mspace(2,i)),real(mspace(4,i))
-     +        ,real(mspace(5,i)),real(mspace(7,i)),real(mspace(8,i))
-     +        ,real(mspace(10,i)),real(mspace(9,i)),real(mspace(11,i))
-     +        ,int(mspace(12,i)),real(mspace(13,i))
-      enddo
-      
-      write(*,*)'**********************************************'
+         do i=1,nmax  
+c     write(1, *) i, (x(d, i),d = 1, dim), (vx(d, i),d = 1, dim),
+c     +        mass (i), rho(i), p(i), u(i), itype(i), hsml(i)
+          write(1,*)int(mspace(1,i)),real(mspace(2,i)),real(mspace(4,i))
+     +            ,real(mspace(5,i)),real(mspace(7,i)),real(mspace(8,i))
+     +          ,real(mspace(10,i)),real(mspace(9,i)),real(mspace(11,i))
+     +          ,int(mspace(12,i)),real(mspace(13,i))
+         enddo
+         
+         write(*,*)'**********************************************'
+      endif
       
       if(itimestep.LT.maxtimestep)goto 10
 ! ===== END OF INTEGRATE======

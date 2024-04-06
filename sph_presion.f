@@ -45,7 +45,7 @@ c      double precision mvij(npairs,ntype(1)),mvxij(3,npairs,ntype(1))
 ! mspace(9,i) = rho      
 ! mspace(10,i) = p
       
-      do i=1,ntype(1)
+      do i=1,ntype(1)!-ntype(2)
          mspace(20,i) = 0.0
          mspace(21,i) = 0.0
          mspace(22,i) = 0.0
@@ -53,9 +53,16 @@ c      double precision mvij(npairs,ntype(1)),mvxij(3,npairs,ntype(1))
          sumx = 0
          sumy = 0
          sumz = 0
+c         write(*,*)i,'sph presion----',mspace(2,i),mspace(4,i)
          do j=1,nfilas(i)
             pjrhoj = mspace(10,pairs(j,i))/mspace(9,pairs(j,i))**2
             mprhoij = mspace(8,pairs(j,i)) * (pirhoi+pjrhoj)
+c            write(*,*)i,j,mspace(2,pairs(j,i)),mspace(4,pairs(j,i))
+c            write(*,*)'i,j',i,j,pairs(j,i),
+c     +           mspace(9,i),mspace(9,pairs(j,i)),
+c     +           mspace(10,i),mspace(10,pairs(j,i)),(pirhoi+pjrhoj),
+c     +           int(mspace(12,i)),int(mspace(12,pairs(j,i))),
+c     +           dwdx(1,j,i),dwdx(3,j,i)
             sumx = sumx + mprhoij*dwdx(1,j,i)
             sumy = sumy + mprhoij*dwdx(2,j,i)
             sumz = sumz + mprhoij*dwdx(3,j,i)

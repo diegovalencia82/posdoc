@@ -58,7 +58,7 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
          mspace(22,i)=0.
       enddo
       
-c      call sph_presion(mspace,ntype,npairs,pairs,nfilas,w,dwdx)
+      call sph_presion(mspace,ntype,npairs,pairs,nfilas,w,dwdx)
 
 c      call tasa_deformacion_epsilon(mspace,ntype,npairs,pairs,nfilas,w,
 c     +     dwdx,mxij,mvij,mvxij,epsilon)

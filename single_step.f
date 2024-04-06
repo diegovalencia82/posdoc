@@ -52,9 +52,9 @@ c rdomain   : smoothing length                                     [in]
       implicit none
       include 'param.inc'
 
-      integer i,j,itimestep, ntotal,npairs,ntype(2)
+      integer i,j,itimestep, ntotal,npairs,ntype(2),nfluid,nvirt
 c     parameter ( npairs = (kappa0+2)**dim)
-      parameter ( npairs = (kappa0+5)**dim)
+      parameter ( npairs = (kappa0+15)**dim)
 c      double precision dt, hsml(nmax), mass(nmax), x(dim,nmax),
 c     &     vx(dim,nmax), u(nmax), s(nmax), rho(nmax), p(nmax),
 c     &      tdsdt(nmax), dx(dim,nmax), dvx(dim,nmax),
@@ -69,10 +69,10 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
       double precision mvij(npairs,ntype(1)),mvxij(3,npairs,ntype(1))
       double precision rrr,xi,yi,dx(dim),r,dwdx0(dim),ww
 
-      rdomain = kappa0 * h0  !equivalent to hsml
+      rdomain = kappa0 * h0 * 1.00000007 !equivalent to hsml
 
       do i=1,nmax
-         mspace(13,i) = h0!rdomain
+         mspace(13,i) = h0      !rdomain
       enddo
       
       write(*,*)'-------------------------------------'
@@ -81,6 +81,8 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
       write(*,*)'rdomain = ',rdomain
       write(*,*)'-------------------------------------'
 
+      call  input(mspace,nfluid,nvirt,1)
+      
       call neighboring_search(rdomain,mspace,ntype,npairs,pairs,nfilas,
      +     mrij,mxij,mvij,mvxij)
 
@@ -89,9 +91,17 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
       
       call wijdwij(mspace,pairs,mrij,mxij,npairs,nfilas,ntype,w,dwdx)
 
-c      call density(mspace,ntype,npairs,pairs,nfilas,w)
+      call density(mspace,ntype,npairs,pairs,nfilas,w)
 
-c      call presioni(mspace,ntype)
+c      do i=1,nmax
+c         do j=1,nfilas(i)
+c            write(*,*)i,j,pairs(j,i),w(j,i),
+c     +           mspace(2,i),mspace(4,i),
+c     +           mspace(2,pairs(j,i)),mspace(4,pairs(j,i)),mrij(j,i)
+c         enddo
+c      enddo
+      
+      call presioni(mspace,ntype)
 
       call momento(mspace,ntype,npairs,pairs,nfilas,w,dwdx,mrij,mxij,
      +     mvij,mvxij,pairsv,nfilasv,mrijv,mxijv)

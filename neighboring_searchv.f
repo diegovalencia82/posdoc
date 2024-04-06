@@ -53,12 +53,12 @@ c     mxiij      : matrix of xi-xj for all fluid particles for each interaction 
 c      mvij = 0.
 c      mvxij = 0.
 
-      nfilasv = 0
+c      nfilasv = 0
       
-      do i = 1,ntype(1)
+      do i = 1,ntype(1)-ntype(2)
 c         if(i.eq.109)write(*,*)i,j,mspace(2,i),mspace(4,i)
-c         nfilasv(i) = 0
-         do j = ntype(1)+1,ntype(1)+ntype(2)
+         nfilasv(i) = 0
+         do j = ntype(1)-ntype(2)+1,nmax!ntype(1)+ntype(2)
             if(i.ne.j)then
                call radioij(mspace(2,i),mspace(3,i),mspace(4,i),
      +              mspace(2,j),mspace(3,j),mspace(4,j),rij,xij,yij,zij)
@@ -72,7 +72,7 @@ c     +              vij,vxij,vyij,vzij)
      +                    ,ntype
                      stop
                   endif
-                  pairsv(nfilasv(i),i) = j!int(mspace(1,j))
+                  pairsv(nfilasv(i),i) = int(mspace(1,j))
                   mrijv(nfilasv(i),i) = rij
                   mxijv(1,nfilasv(i),i)  = xij
                   mxijv(2,nfilasv(i),i)  = yij
