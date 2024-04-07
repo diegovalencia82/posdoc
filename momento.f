@@ -60,12 +60,12 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
       
       call sph_presion(mspace,ntype,npairs,pairs,nfilas,w,dwdx)
 
-c      call tasa_deformacion_epsilon(mspace,ntype,npairs,pairs,nfilas,w,
-c     +     dwdx,mxij,mvij,mvxij,epsilon)
+      call tasa_deformacion_epsilon(mspace,ntype,npairs,pairs,nfilas,w,
+     +     dwdx,mxij,mvij,mvxij,epsilon)
 
       viscforce = 0.0
-c      call viscous_force(mspace,ntype,npairs,pairs,nfilas,dwdx,epsilon,
-c     +     viscforce)
+      call viscous_force(mspace,ntype,npairs,pairs,nfilas,dwdx,epsilon,
+     +     viscforce)
 
       call external_force(mspace,ntype,npairs,pairsv,nfilasv,mrijv,mxijv
      +     ,extforce)
