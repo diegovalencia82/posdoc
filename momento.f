@@ -70,7 +70,7 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
       call external_force(mspace,ntype,npairs,pairsv,nfilasv,mrijv,mxijv
      +     ,extforce)
       
-      do i=1,ntype(1)
+      do i=1,ntype(1) - ntype(2)
          mspace(20,i) = mspace(20,i) + viscforce(1,i) + viscforce(2,i) +
      +        viscforce(3,i) + extforce(1,i)
          mspace(21,i) = mspace(21,i) + viscforce(4,i) + viscforce(5,i) +

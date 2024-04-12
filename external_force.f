@@ -56,7 +56,6 @@ c     mxij      : matrix of xi-xj for all fluid particles for each interaction [
          fy = 0.0d0
          fz = 0.0d0
          f = 0.0
-         if(i.eq.54)write(*,*)mspace(2,i),mspace(4,i),fx,fz
          do j=1,nfilasv(i)
          if(mrijv(j,i).lt.r0)then
             f = dd*( (r0/mrijv(j,i))**p1 - (r0/mrijv(j,i))**p2  ) /
@@ -65,8 +64,6 @@ c     mxij      : matrix of xi-xj for all fluid particles for each interaction [
             fy = fy + f*mxijv(2,j,i)
             fz = fz + f*mxijv(3,j,i)
 c            write(*,*)i,j,nfilasv(i),mrijv(j,i),fx,fy,fz
-            if(i.eq.54)write(*,*)'FFFFFFFFFFFFF',mspace(2,pairsv(j,i)),
-     +  mspace(4,pairsv(j,i)),fx,fz,mrijv(j,i),f!mxijv(1,j,i),mxijv(3,j,i)
 c            call radioij(mspace(2,i),mspace(3,i),mspace(4,i),
 c     +           mspace(2,pairsv(j,i)),mspace(3,pairsv(j,i)),
 c     +           mspace(4,pairsv(j,i)),rijv,xijv,yijv,zijv)

@@ -44,7 +44,7 @@ c     &     hsml(nmax), dt
 c      double precision dx(dim,nmax),dvx(dim,nmax),du(dim,nmax),
 c     +     ds(dim,nmax),drho(dim,nmax),av
       double precision t(maxtimestep),dt,av
-      double precision mspace(25,nmax)
+      double precision mspace(25,nmax),v_m(3,nmax)
       double precision xy(4),dxydt(4)
       character infilebas*80,outfile(10000)*80
       
@@ -52,54 +52,77 @@ c     --  Make an array of outfiles using a base outfile
       itoutfile = 0
       infilebas = 'snapshot'
       rangg(1)=1
-      rangg(2)=10000
+      rangg(2)=20000
       call array_infilebase(infilebas,rangg,outfile,1,nf)  
       
 c---  Definition of variables derivates
 
-      itimestep = 0
-      t = 0.0
-      
- 10   call single_step(mspace,ntype,itimestep,dt,av)
+      itimestep = initime
+      itoutfile = inioutfile
+c      t = 0.0
 
-      do i=1,ntype(1)-ntype(2)
-         xy(1) = mspace(2,i)
-         xy(2) = mspace(4,i)
-         xy(3) = mspace(5,i)
-         xy(4) = mspace(7,i)
+ 10   if(itimestep.ne.1)then
+         do i=1,ntype(1)-ntype(2)
+            v_m(1,i) = mspace(5,i)
+            !v_m(2,i) = mspace(6,i)
+            v_m(3,i) = mspace(7,i)
+            mspace(5,i) = mspace(5,i) + (dt0/2.)*mspace(20,i)
+            mspace(7,i) = mspace(7,i) + (dt0/2.)*mspace(22,i)
+c            mspace(2,i) = mspace(2,i) + dt0 * mspace(5,i)
+c            mspace(4,i) = mspace(4,i) + dt0 * mspace(7,i)
+         enddo
+      endif
+      
+! 10   call single_step(mspace,ntype,itimestep,dt,av)
+      call single_step(mspace,ntype,itimestep,dt,av)
+
+!      Método de Euler ----------10      
+!      do i=1,ntype(1)-ntype(2)
+!         xy(1) = mspace(2,i)
+!         xy(2) = mspace(4,i)
+!         xy(3) = mspace(5,i)
+!         xy(4) = mspace(7,i)
 
 c     call derivadas(i,t(i),xy,dxydt,mspace)
 
-c         mspace(2,i) = mspace(2,i) + dt0*mspace(5,i)
-c         mspace(5,i) = mspace(5,i) + dt0*mspace(20,i)
-
-c         mspace(4,i) = mspace(4,i) + dt0*mspace(7,i)
-c         mspace(7,i) = mspace(7,i) + dt0*mspace(22,i)
-
-         xy(3) = xy(3) + dt0*mspace(20,i)
-         xy(1) = xy(1) + dt0*xy(3)
-         xy(4) = xy(4) + dt0*mspace(22,i)
-         xy(2) = xy(2) + dt0*xy(4)
-
+!         xy(3) = xy(3) + dt0*mspace(20,i)
+!         xy(1) = xy(1) + dt0*xy(3)
+!         xy(4) = xy(4) + dt0*mspace(22,i)
+!         xy(2) = xy(2) + dt0*xy(4)
          
 c         call rk4_dd(xy,dxydt,4,t(i),dt0,xy,derivadas,mspace,i)
 
-         mspace(2,i) = xy(1)
-         mspace(4,i) = xy(2)
-         mspace(5,i) = xy(3)
-         mspace(7,i) = xy(4)
+!         mspace(2,i) = xy(1)
+!         mspace(4,i) = xy(2)
+!         mspace(5,i) = xy(3)
+!         mspace(7,i) = xy(4)
 c         write(*,*)i,xy,mspace(20,i),mspace(22,i)
-
-         
-      enddo
-
+!      enddo
+!      fin método de Euler
+      
+      if(itimestep.eq.1)then
+         do i=1,ntype(1)-ntype(2)
+            mspace(5,i) = mspace(5,i) + (dt0/2.)*mspace(20,i)
+            mspace(7,i) = mspace(7,i) + (dt0/2.)*mspace(22,i)
+            mspace(2,i) = mspace(2,i) + dt0 * mspace(5,i)
+            mspace(4,i) = mspace(4,i) + dt0 * mspace(7,i)
+         enddo
+      else
+         do i=1,ntype(1)-ntype(2)
+            mspace(5,i) = v_m(1,i) + (dt0/2.)*mspace(20,i)
+            mspace(7,i) = v_m(3,i) + (dt0/2.)*mspace(22,i)
+            mspace(2,i) = mspace(2,i) + dt0 * mspace(5,i)
+            mspace(4,i) = mspace(4,i) + dt0 * mspace(7,i)
+         enddo
+      endif
+      
       itimestep = itimestep + 1
       t(itimestep) = itimestep * dt0
-      write(*,*)'iteration',itimestep,'time = ',t(itimestep)
 
       if (mod(itimestep,save_step).eq.0) then
          itoutfile = itoutfile + 1
          write(*,*)'Saving file = ',outfile(itoutfile)
+         write(*,*)'iteration',itimestep,'time = ',t(itimestep)
          
          l = len_trim(outfile(itoutfile))
          open(1,file=outfile(itoutfile))
@@ -117,7 +140,7 @@ c     +        mass (i), rho(i), p(i), u(i), itype(i), hsml(i)
          write(*,*)'**********************************************'
       endif
       
-      if(itimestep.LT.maxtimestep)goto 10
+      if(itimestep.LT.fintime)goto 10
 ! ===== END OF INTEGRATE======
       
       end

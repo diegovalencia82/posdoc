@@ -74,13 +74,15 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
       do i=1,nmax
          mspace(13,i) = h0      !rdomain
       enddo
-      
-      write(*,*)'-------------------------------------'
-      write(*,*)'Max number of n pairs = ',npairs
-      write(*,*)'kappa0 = ',kappa0,'  h0 = ',h0
-      write(*,*)'rdomain = ',rdomain
-      write(*,*)'-------------------------------------'
 
+      if (mod(itimestep,save_step).eq.0) then
+         write(*,*)'-------------------------------------'
+         write(*,*)'Max number of n pairs = ',npairs
+         write(*,*)'kappa0 = ',kappa0,'  h0 = ',h0
+         write(*,*)'rdomain = ',rdomain
+         write(*,*)'-------------------------------------'
+      endif
+      
       call  input(mspace,nfluid,nvirt,1)
       
       call neighboring_search(rdomain,mspace,ntype,npairs,pairs,nfilas,

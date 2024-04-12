@@ -29,7 +29,10 @@ c     ntotal-- total particle number                               [out]
       integer i, i1, i2, d, im, sel
       
 c     load initial particle information from external disk file
-      open(10,file="snapshot_000",status='old')
+c     open(10,file="snapshot_000",status='old')
+      open(10,file=infile,status='old')
+      
+
       if(sel.eq.0)write(*,*)' ****************************************'
       if(sel.eq.0)write(*,*)'Loading initial particle configuration...'
       read (10,*) itimestep,time,nfluid,nvirt
@@ -42,6 +45,7 @@ c     load initial particle information from external disk file
       write(*,*)'       itimestep = ',itimestep,'   Time = ',time
       write(*,*)'   ************************************************'
       endif
+      
  11   read(10,*,end=12)id(i), (x(d, i),d = 1, dim),
      +     (vx(d, i),d = 1, dim),mass(i), rho(i), p(i), u(i),itype(i),
      +     hsml(i)
@@ -93,7 +97,6 @@ c     mspace(6,i)  = vx(2,i)
             mspace(13,i) = hsml(i)
          endif
          
-c         write(*,*)id(i),mspace(13,i)
       enddo
       
       end

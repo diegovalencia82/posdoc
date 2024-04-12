@@ -23,10 +23,7 @@ c     Aaproximación SPH para la densida
          rho = 0
          do j=1,nfilas(i)
             mspace(9,i) = mspace(9,i) + mspace(8,pairs(j,i))*w(j,i)
-c            rho = mspace(9,pairs(j,i)) + mspace(8,pairs(j,i))*w(j,i)
          enddo
-c     mspace(9,i) = rho
-c         write(*,*)i,mspace(9,i),mspace(8,i)
       enddo
       
       end
