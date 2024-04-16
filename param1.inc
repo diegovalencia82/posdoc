@@ -12,13 +12,13 @@ c     dim : Dimension of the problem (1, 2 or 3)
 
 c     nmax	: Maximum number of particles
       integer nmax
-      parameter ( nmax = 3566 )
+      parameter ( nmax = 3696 )
 c
       integer maxtimestep, initime, fintime, inioutfile
-      parameter ( initime = 0, fintime = 12000 ) 
-      parameter ( maxtimestep = 12001, inioutfile = 0000) 
+      parameter ( initime = 3000, fintime = 6000 ) 
+      parameter ( maxtimestep = 7000, inioutfile = 600) 
       character infile*80
-      parameter ( infile = 'snapshot_000' )
+      parameter ( infile = 'snapshot_0600' )
 
 c     Time step integration
       double precision dt0
@@ -48,8 +48,7 @@ c     g = 9.8. Gravity
 c     Artificial EOS.
 c     Initial density of particles, rho0
       double precision gamma, beta, rho0
-c      parameter ( gamma=7.0, beta = 5.0, rho0 = 1000.0)
-      parameter ( gamma=7.0, beta = 5.0, rho0 = 916.0)
+      parameter ( gamma=7.0, beta = 5.0, rho0 = 1000.0)
 
 c      To save steps
        integer save_step
