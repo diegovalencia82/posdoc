@@ -83,7 +83,7 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
          write(*,*)'-------------------------------------'
       endif
       
-      call  input(mspace,nfluid,nvirt,1)
+      call  input(mspace,ntotal,nfluid,nvirt,1)
       
       call neighboring_search(rdomain,mspace,ntype,npairs,pairs,nfilas,
      +     mrij,mxij,mvij,mvxij)

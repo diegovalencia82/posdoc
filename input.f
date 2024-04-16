@@ -1,5 +1,5 @@
 
-      subroutine input(mspace,nfluid,nvirt,sel)
+      subroutine input(mspace,ntotal,nfluid,nvirt,sel)
 
 c-----------------------------------------------------------------
 
@@ -35,8 +35,8 @@ c     open(10,file="snapshot_000",status='old')
 
       if(sel.eq.0)write(*,*)' ****************************************'
       if(sel.eq.0)write(*,*)'Loading initial particle configuration...'
-      read (10,*) itimestep,time,nfluid,nvirt
-      ntotal = nfluid + nvirt
+      read (10,*) itimestep,time,ntotal,nfluid,nvirt
+
       i=1
       if(sel.eq.0)then
       write(*,*)'       Total number of particles       ', ntotal

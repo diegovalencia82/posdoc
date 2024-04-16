@@ -37,7 +37,8 @@ c     dt-- timestep                                             [input]
       implicit none 
       include 'param.inc'
 
-      integer i,j,l,ntype(2),ntotal,itimestep,nf,rangg(2),itoutfile
+      integer i,j,l,ntype(2),ntotal,itimestep,nf,rangg(2),itoutfile,
+     +     nfluid
 c      double precision x(dim, nmax), vx(dim, nmax), mass(nmax), 
 c     &      rho(nmax), p(nmax), u(nmax), c(nmax), s(nmax), e(nmax), 
 c     &     hsml(nmax), dt
@@ -126,7 +127,8 @@ c         write(*,*)i,xy,mspace(20,i),mspace(22,i)
          
          l = len_trim(outfile(itoutfile))
          open(1,file=outfile(itoutfile))
-         write(1,*)itimestep,t(itimestep),ntype(1),ntype(2)
+         nfluid = ntype(1)-ntype(2)
+         write(1,*)itimestep,t(itimestep),ntype(1),nfluid,ntype(2)
       
          do i=1,nmax  
 c     write(1, *) i, (x(d, i),d = 1, dim), (vx(d, i),d = 1, dim),

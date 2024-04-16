@@ -40,8 +40,16 @@ c     +     e(nmax), hsml(nmax), dt
 
       dt = dt0
       
-      call input(mspace,nfluid,nvirt,0)
-      ntotal = nfluid + nvirt
+      call input(mspace,ntotal,nfluid,nvirt,0)
+c     ntotal = nfluid + nvirt
+c     nfluid = ntotal - nvirt
+
+      if(ntotal.ne.nmax)then
+         write(*,*)'Different ntotal and nmax, 
+     +change nmax in param file'
+         stop
+      endif
+      
       ntype(1) = nmax!nfluid
       ntype(2) = nvirt
       write(*,*)' **************************************************'
