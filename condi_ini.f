@@ -22,14 +22,16 @@ c     nt2 = -1: Walls particles or virtual particles
 
       integer j,k,m,n,nvirt,mp,np,nt,nt1,nt2
       integer itimestep
-      double precision xx1,yy1,dx,dy,r0,bc(dim,4),vxi(dim)
-      double precision ht,gamma,rho0,b,lengsx,lengsy,delt,time
+      double precision xx1,yy1,dx,dy,r0,bc(dim,4),vxi(dim),xybox(5)
+      double precision ht,gamma,rho0,b,lengsx,lengsy,delt,time,mu,beta
 
       open(10,file="condiciones_iniciales.txt")
       
       PI=4.*atan(1.0)
-      rho0=916!1000.
-
+      rho0=1000.
+      mu = 1.002e-3
+      beta = 1.
+      
       m=54
 
       lengsx = 500.
@@ -50,9 +52,16 @@ c     nt2 = -1: Walls particles or virtual particles
       vxi(2)=0.0
       nt=0
       write(*,*)'1 box, nt=',nt
-      call boxparticles(dim,m,maxn,rho0,bc,ht,vxi,dx,nt,x,vx,mass,
-     +     rho,p,u,itype,hsml)
 
+      xybox(1) = 0.0d0 ! xybox(1): x Initial Position of the box
+      xybox(2) = 0.0d0 ! xybox(2): y Initial Position of the box
+      xybox(3) = 2.0d0 ! xybox(3): High of the box
+      xybox(4) = 2.0d0 ! xybox(4): lower side of the box
+      xybox(5) = 0.0 ! xybox(5): angle position of the box
+      
+      call boxparticles01(dim,m,maxn,rho0,bc,ht,vxi,dx,nt,x,vx,mass,
+     +     rho,p,u,itype,hsml,xybox,mu,beta)
+      
       nt1 = nt
       do i=1,nt
          x1(i)=x(1,i)
@@ -78,20 +87,24 @@ c     nt2 = -1: Walls particles or virtual particles
       call pgbeg(0,'pgp_condini.ps/cps',1,1)
       call pgscf(2)
       call pgsch(1.0)
-      xmin = -0.05!-10*dx
-      xmax =  2.15!7*xx1+10*dx
-      ymin = -0.05!-10*dx
-      ymax =  1.5!yy1+10*dx
+      xmin = -1.!-10*dx
+      xmax =  5.!7*xx1+10*dx
+      ymin = -2.!-10*dx
+      ymax =  2.!yy1+10*dx
       call pgenv(xmin,xmax,ymin,ymax,1,2)
 c      call pgenv(-0.1,3.5,-0.3,1.5,1,0)
       call pgsci(2)
-      call pgpt(nt,x1,y1,17)
+      call pgpt(nt,x1,y1,-1)
 c      call pgline(nt,x1,y1)
       call pgsci(1)
       call pgtext(0.4,0.4,'T=0.00')
       
-      call virtpartfallwater(nt,maxn,dim,dx,hsml(1),mass(1),
-     +     itypev,hsmlv,massv,xv,vxv,rhov,uv,pv,nvirt,ht,rho0)
+c      call virtpartfallwater(nt,maxn,dim,dx,hsml(1),mass(1),
+c     +     itypev,hsmlv,massv,xv,vxv,rhov,uv,pv,nvirt,ht,rho0)
+
+      call virtbox(beta,nt,maxn,dim,dx,hsml(1),mass(1),
+     +     itypev,hsmlv,massv,xv,vxv,rhov,uv,pv,nvirt,ht,rho0,xybox,1)
+      
       nt2 = nvirt
      
       call pgend
@@ -282,7 +295,7 @@ ccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccc
 
       subroutine boxparticles(dim,m,maxn,rho0,bc,ht,vxi,dx,nt,x,vx,
-     +     mass,rho,p,u,itype,hsml)
+     +     mass,rho,p,u,itype,hsml,xybox)
       implicit none
 
       integer dim,nt,ni,m,maxn,mp,n,np,ntotal,i,j,k
@@ -291,9 +304,11 @@ ccccccccccccccccccccccccccccccccccccccccc
       double precision b,gamma,rhoa
       double precision xa(dim, maxn),vxi(2)
       double precision x(dim, maxn), vx(dim, maxn), mass(maxn),
-     &     p(maxn), u(maxn), hsml(maxn), rho(maxn),dxy !, PI
-      double precision c,beta,g
+     &     p(maxn), u(maxn), hsml(maxn), rho(maxn),dxy
+      double precision c,beta,g, xybox(5),PI,ang
 
+      PI = 4.*atan(1.0)
+      ang = xybox(5)*PI/180.
       g = 9.8
       
       xx1 = bc(1,2)-bc(1,1) 
@@ -306,7 +321,7 @@ ccccccccccccccccccccccccccccccccccccccccc
       mp = m-1
       ntotal =  mp * np
       ni = nt
-      dxy = dx!0.92*sqrt(dx*dx+dy*dy)!0.82*sqrt(dx*dx+dy*dy) !0.92*sqrt(dx*dx+dy*dy)
+      dxy = dx
       
 c     nt=0
       gamma=7.
@@ -322,8 +337,8 @@ c      c = 1400
       do i = 1, mp
          do j = 1 , np
             nt = nt + 1
-            x(1, nt) = (i-1)*dx + dx/2. + bc(1,1)
-            x(2, nt) = (j-1)*dy + dy/2. + bc(2,1)
+            x(1, nt) = ((i-1)*dx + dx/2. + bc(1,1) )
+            x(2, nt) = ((j-1)*dy + dy/2. + bc(2,1) )
             vx(1,nt)=vxi(1)
             vx(2,nt)=vxi(2)
             rho (nt) = rho0*( 1+ rho0*9.8*(ht-x(2,j))/b  )**(1./gamma) !1000.
@@ -339,21 +354,181 @@ c            b = 200*9.8*ht/(rho(nt)*gamma)
 
       write(*,*)'m=',m,'n=',n,'dx=',dx,'dy=',dy
      +     ,'ntotal=',ntotal,'nt=',nt,'dxy=',dxy
+            
+      return
+      end
+
+
+c=================================================================
+
+! this subrutain make a box
+      subroutine virtbox(beta,ntotal,maxn,dim,dx,hsml1,dmasa,
+     +     itype,hsml,mass,x,vx,rho,u,p,nvirt,ht,rho0,xybox,sel)
+      implicit none
+
+! xybox(1): x Initial Position of the box
+! xybox(2): y Initial Position of the box
+! xybox(3): High of the box
+! xybox(4): lower side of the box
+! xybox(5): angle position of the box
       
-c      ht = yy1!1.e-3*lengs
-c      gamma=7.
-c      b = 200*9.8*ht/(rho0*gamma)
       
-c      do i=1,ntotal
-c         vx(1,i)=vxi(1)
-c         vx(2,i)=vxi(2)
-c         rho (i) = rho0*( 1+ rho0*9.8*(ht-x(2,i))/b  )**(1./gamma)!1000.
-c         mass(i) = dx*dy*rho(i)
-c         p(i)= 0.0
-c         u(i)=357.1
-c         itype(i) = 2
-c         hsml(i) = 0.92*sqrt(dx*dx+dy*dy)!0.92*sqrt(dx*dx+dy*dy)
-c      enddo
+      integer ntotal, nvirt, maxn, dim, sel
+      integer itype(maxn)
+      double precision hsml(maxn),mass(maxn),x(dim,maxn),vx(dim, maxn),
+     &     rho(maxn), u(maxn), p(maxn)
+      integer i, j, mp
+      double precision leng, dx,v_inf,hsml1,dl,dmasa,xy(2),vxy(2),ang,PI
+
+      double precision gamma,beta,c,b,ht,rho0,xybox(5)
+      real x1(maxn),y1(maxn),xmin,xmax,ymin,ymax
+
+      PI=4.*atan(1.0)
+
+      gamma=7.
+c      beta = 5.0!0.003
+      c = beta*sqrt(9.8*ht)
+      b = rho0*c*c/gamma
+
+      nvirt = 0
+
+      ! Left side
+      leng   = xybox(3)
+      ang    = (xybox(5) + 90.0d0) * (PI/180.0d0)! 90 * (PI/180.)
+      xy(1)  = xybox(1)
+      xy(2)  = xybox(2)
+      vxy(1) = 0.0
+      vxy(2) = 0.0
+      call walls(dx,leng,xy,vxy,ang,maxn,ntotal,dim,x,vx,nvirt)
+      write(*,*)'nvirt=',nvirt
       
+      !lower side
+      leng   = xybox(4) - dx
+      ang    = xybox(5) * (PI/180.)
+      xy(1)  = dx/2. + xybox(1)
+      xy(2)  = xybox(2)
+      vxy(1) = 0.0
+      vxy(2) = 0.0
+      call walls(dx,leng,xy,vxy,ang,maxn,ntotal,dim,x,vx,nvirt)
+      write(*,*)'nvirt=',nvirt
+
+      !Rigth side
+      leng   = xybox(3)
+      ang    = (xybox(5) + 90) * (PI/180.)
+      xy(1)  = xybox(1) + xybox(4)*dcos(xybox(5)*PI/180.)
+      xy(2)  = xybox(2) + xybox(4)*dsin(xybox(5)*PI/180.)
+      vxy(1) = 0.0
+      vxy(2) = 0.0
+      call walls(dx,leng,xy,vxy,ang,maxn,ntotal,dim,x,vx,nvirt)
+      write(*,*)'nvirt=',nvirt
+
+      if(sel.eq.1)then
+      !Upper side
+         leng   = xybox(4) - dx/2.
+         ang    = xybox(5) * (PI/180.)
+         xy(1)  = xybox(1) - xybox(3)*dsin(xybox(5)*PI/180.)
+         xy(2)  = xybox(2) + dx/2. + xybox(3)*dcos(xybox(5)*PI/180.)
+         vxy(1)=0.0
+         vxy(2)=0.0
+         call walls(dx,leng,xy,vxy,ang,maxn,ntotal,dim,x,vx,nvirt)
+         write(*,*)'nvirt=',nvirt
+      endif
+         
+      
+      do i = 1, nvirt
+         x1(i)=x(1, ntotal + i)
+         y1(i)=x(2, ntotal + i)
+      enddo
+      call pgsci(4)
+      call pgpt(nvirt,x1,y1,1)
+      
+      
+      mp=nvirt
+      
+      write(*,*)'r_vmin=',x1(2)-x1(1)
+      write(10,*)'r_vmin=',x1(2)-x1(1)
+      
+      write(*,*)'nvirt=',nvirt,'ntotal=',ntotal
+      write(10,*)'nvirt=',nvirt,'ntotal=',ntotal
+      
+      do i = 1, nvirt
+         rho(ntotal + i) = 1000.
+         mass(ntotal + i) = rho(ntotal + i) * dx * dx
+         p(ntotal + i) = b*((rho(ntotal+i)/rho0)**gamma - 1.0)
+         u(ntotal + i) = 357.1
+         itype(ntotal + i) = -1
+         hsml(ntotal + i) = hsml1 !dx
+c         write(*,*)ntotal + i,'nvirt=',nvirt,x(1, ntotal + i)
+      enddo
+      write(*,*)'hsml1, dx',hsml1,dx
+      write(10,*)'hsml1, dx',hsml1,dx
+     
+      return
+      end
+
+c========================================================================      
+      subroutine boxparticles01(dim,m,maxn,rho0,bc,ht,vxi,dx,nt,x,vx,
+     +     mass,rho,p,u,itype,hsml,xybox,mu,beta)
+      implicit none
+
+      integer dim,nt,ni,m,maxn,mp,n,np,ntotal,i,j,k
+      integer itype(maxn)
+      double precision rho0,bc(dim,4),dx,dy,ht,xx1,yy1
+      double precision b,gamma,rhoa
+      double precision xa(dim, maxn),vxi(2)
+      double precision x(dim, maxn), vx(dim, maxn), mass(maxn),
+     &     p(maxn), u(maxn), hsml(maxn), rho(maxn),dxy
+      double precision c,beta,g,mu,xybox(5),PI,ang,vxy(2),xy(2)
+
+      PI = 4.*atan(1.0)
+      ang = xybox(5)*PI/180.
+      vxy(1) = 0.0
+      vxy(2) = 0.0
+      xx1 = bc(1,2)-bc(1,1) 
+      yy1 = bc(2,3)-bc(2,1)
+      
+      g = 9.8
+      
+      np = m-1
+      dy = yy1/np
+      dx = dy
+      m = nint(xx1/dx) + 1
+      mp = m-1
+      ntotal =  mp * np
+      ni = nt
+      dxy = dx
+      
+c     nt=0
+      gamma=7.
+c      beta = 5.0!0.003
+      c = beta*sqrt(9.8*ht)
+c      c=1480.
+c      b = c*c*rho0/gamma
+c      b = beta*g*ht*rho0/(gamma)
+
+c      c = 1400
+      b = rho0*c*c/gamma
+      
+      do i = 1, mp
+         do j = 1 ,np
+            nt = nt + 1
+            xy(1) = (i-1)*dx + dx/2. + bc(1,1)
+            xy(2) = (j-1)*dy + dy/2. + bc(2,1)
+            x(1, nt) = xy(1)*cos(ang) - xy(2)*sin(ang) 
+            x(2, nt) = xy(1)*sin(ang) + xy(2)*cos(ang) 
+            vx(1,nt)=vxi(1)
+            vx(2,nt)=vxi(2)
+            rho (nt) = rho0*( 1+ rho0*9.8*(ht-x(2,j))/b  )**(1./gamma)
+            mass(nt) = dx*dy*rho(i)
+            p(nt)= b*((rho(nt)/rho0)**gamma - 1.0)
+            u(nt)=357.1
+            itype(nt) = 1
+            hsml(nt) = dxy
+         enddo
+      enddo      
+
+      write(*,*)'m=',m,'n=',n,'dx=',dx,'dy=',dy
+     +     ,'ntotal=',ntotal,'nt=',nt,'dxy=',dxy
+            
       return
       end

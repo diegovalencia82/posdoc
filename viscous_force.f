@@ -44,13 +44,13 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
       double precision mspace(25,nmax)
       integer pairs(npairs,ntype(1)),nfilas(ntype(1))
       double precision w(npairs,ntype(1)),dwdx(3,npairs,ntype(1))
-      double precision viscforce(9,ntype(1)),epsilon(6,ntype(1)),mu
+      double precision viscforce(9,ntype(1)),epsilon(6,ntype(1))
       double precision sumvisxx,sumvisxy,sumvisxz,sumvisyx,sumvisyy,
      +     sumvisyz,sumviszx,sumviszy,sumviszz,eirhoixx,eirhoixy,
      +     eirhoixz,eirhoiyx,eirhoiyy,eirhoiyz,eirhoizx,eirhoizy,
      +     eirhoizz,rhoi2,rhoj2     
 
-      mu = 80.8                   !1.0e-3               ! Viscosidad dinámica
+c      mu = 1.!80.8                   !1.0e-3               ! Viscosidad dinámica
 c      mu = 1.0e-3               ! Viscosidad dinámica
 
       
@@ -108,15 +108,15 @@ c      mu = 1.0e-3               ! Viscosidad dinámica
      +           epsilon(6,pairs(j,i))/rhoj2 ) * dwdx(3,j,i)            
          enddo
 
-         viscforce(1,i) = mu * sumvisxx
-         viscforce(2,i) = mu * sumvisxy
-         viscforce(3,i) = mu * sumvisxz
-         viscforce(4,i) = mu * sumvisyx
-         viscforce(5,i) = mu * sumvisyy
-         viscforce(6,i) = mu * sumvisyz
-         viscforce(7,i) = mu * sumviszx
-         viscforce(8,i) = mu * sumviszy
-         viscforce(9,i) = mu * sumviszz
+         viscforce(1,i) = muc * mu * sumvisxx
+         viscforce(2,i) = muc * mu * sumvisxy
+         viscforce(3,i) = muc * mu * sumvisxz
+         viscforce(4,i) = muc * mu * sumvisyx
+         viscforce(5,i) = muc * mu * sumvisyy
+         viscforce(6,i) = muc * mu * sumvisyz
+         viscforce(7,i) = muc * mu * sumviszx
+         viscforce(8,i) = muc * mu * sumviszy
+         viscforce(9,i) = muc * mu * sumviszz
          
       enddo
       
