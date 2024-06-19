@@ -58,7 +58,7 @@ c     mxiij      : matrix of xi-xj for all fluid particles for each interaction 
       mvij = 0.
       mvxij = 0.
       
-      do i = 1,ntype(1)
+      do i = 1,ntype(1) - ntype(2)
          nfilas(i) = 0
          do j = 1,ntype(1)
             if(i.ne.j)then

@@ -36,7 +36,7 @@ c     mxij      : matrix of xi-xj for all fluid particles for each interaction [
 
       double precision rijv,xijv,yijv,zijv
 
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          extforce(1,i) = 0.0d0
          extforce(2,i) = 0.0d0
          extforce(3,i) = 0.0d0
@@ -51,29 +51,29 @@ c     mxij      : matrix of xi-xj for all fluid particles for each interaction [
       p2 = 6
       r0 = h0/1.1!kappa0 * h0!h0
       
-      do i=1,ntype(1)-ntype(2)
-         fx = 0.0d0
-         fy = 0.0d0
-         fz = 0.0d0
-         f = 0.0
-         do j=1,nfilasv(i)
-         if(mrijv(j,i).lt.r0)then
-            f = dd*( (r0/mrijv(j,i))**p1 - (r0/mrijv(j,i))**p2  ) /
-     +           mrijv(j,i)**2
-            fx = fx + f*mxijv(1,j,i)
-            fy = fy + f*mxijv(2,j,i)
-            fz = fz + f*mxijv(3,j,i)
-c            write(*,*)i,j,nfilasv(i),mrijv(j,i),fx,fy,fz
-c            call radioij(mspace(2,i),mspace(3,i),mspace(4,i),
-c     +           mspace(2,pairsv(j,i)),mspace(3,pairsv(j,i)),
-c     +           mspace(4,pairsv(j,i)),rijv,xijv,yijv,zijv)
-c     write(*,*)i,j,r0,mrijv(j,i),f,mxijv(1,j,i),mxijv(3,j,i),fx,fy,fz
+c      do i=1,ntype(1)-ntype(2)
+c         fx = 0.0d0
+c         fy = 0.0d0
+c         fz = 0.0d0
+c         f = 0.0
+c         do j=1,nfilasv(i)
+c         if(mrijv(j,i).lt.r0)then
+c            f = dd*( (r0/mrijv(j,i))**p1 - (r0/mrijv(j,i))**p2  ) /
+c     +           mrijv(j,i)**2
+c            fx = fx + f*mxijv(1,j,i)
+c            fy = fy + f*mxijv(2,j,i)
+c            fz = fz + f*mxijv(3,j,i)
+cc            write(*,*)i,j,nfilasv(i),mrijv(j,i),fx,fy,fz
+cc            call radioij(mspace(2,i),mspace(3,i),mspace(4,i),
+cc     +           mspace(2,pairsv(j,i)),mspace(3,pairsv(j,i)),
+cc     +           mspace(4,pairsv(j,i)),rijv,xijv,yijv,zijv)
+cc     write(*,*)i,j,r0,mrijv(j,i),f,mxijv(1,j,i),mxijv(3,j,i),fx,fy,fz
             
-            endif
-         enddo
-         extforce(1,i) = extforce(1,i) + fx
-         extforce(2,i) = extforce(2,i) + fy
-         extforce(3,i) = extforce(3,i) + fz
-      enddo
+c            endif
+c         enddo
+c         extforce(1,i) = extforce(1,i) + fx
+c         extforce(2,i) = extforce(2,i) + fy
+c         extforce(3,i) = extforce(3,i) + fz
+c      enddo
       
       end

@@ -71,6 +71,13 @@ c     epsilon(6,i) : Tasa de deformación $\varepsilon^{zz}$
      +     ,extforce)
       
       do i=1,ntype(1) - ntype(2)
+c         write(*,*)'xx',i,mspace(20,i),viscforce(1,i) + viscforce(2,i) +
+c     +        viscforce(3,i)
+c         write(*,*)'yy',i,mspace(21,i),viscforce(4,i) + viscforce(5,i) +
+c     +        viscforce(6,i)
+c         write(*,*)'zz',i,mspace(22,i),viscforce(7,i) + viscforce(8,i) +
+c     +        viscforce(9,i)
+         
          mspace(20,i) = mspace(20,i) + viscforce(1,i) + viscforce(2,i) +
      +        viscforce(3,i) + extforce(1,i)
          mspace(21,i) = mspace(21,i) + viscforce(4,i) + viscforce(5,i) +

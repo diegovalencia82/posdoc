@@ -88,8 +88,8 @@ c     &     du(nmax), ds(nmax), drho(nmax), av(dim, nmax)
       call neighboring_search(rdomain,mspace,ntype,npairs,pairs,nfilas,
      +     mrij,mxij,mvij,mvxij)
 
-      call neighboring_searchv(rdomain,mspace,ntype,npairs,pairsv,
-     +     nfilasv,mrijv,mxijv)
+c      call neighboring_searchv(rdomain,mspace,ntype,npairs,pairsv,
+c     +     nfilasv,mrijv,mxijv)
       
       call wijdwij(mspace,pairs,mrij,mxij,npairs,nfilas,ntype,w,dwdx)
 

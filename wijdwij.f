@@ -27,7 +27,7 @@ c     dwdx      : Derivative of kernel with respect to x, y and z      [out]
       double precision dx(dim),r,dwdx0(dim)
       double precision mhsml
      
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          do j = 1,nfilas(i)
 c            write(*,*)i,j,nfilas(i),mrij(j,i),mxij(1,j,i),mxij(3,j,i)
 c     +           mxij(2,nfilas(i),i),mxij(3,nfilas(i),i),  

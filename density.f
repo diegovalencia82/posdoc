@@ -14,16 +14,18 @@ c     Aaproximación SPH para la densida
       enddo
       
       r = 0.
-      do i=1,ntype(1)
+      do i=1,ntype(1)-ntype(2)
          call Kernel(r,dx,mspace(13,i),selfdens,dx)
          mspace(9,i) = selfdens * mspace(8,i)
       enddo
       
-      do i=1,ntype(1)
-         rho = 0
+      do i=1,ntype(1)-ntype(2)
+c         rho = 0
          do j=1,nfilas(i)
             mspace(9,i) = mspace(9,i) + mspace(8,pairs(j,i))*w(j,i)
+c            write(*,*)'density',i,mspace(9,i),mspace(12,i),w(j,i)
          enddo
+c         write(*,*)'density',i,mspace(9,i),mspace(12,i),w(j,i)
       enddo
       
       end
